@@ -11,4 +11,11 @@ Jessica Cisneros
 ### Goals
 [ ] Complete the `Neural Network Training`
 
-### BreakDown
+### BreakDown/Goals
+
+#### Summary of the Project
+- Determine the best targeted advertising campaign for a company 
+
+
+- Two Neural Networks and Train on the Data
+- 
