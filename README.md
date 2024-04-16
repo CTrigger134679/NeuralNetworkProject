@@ -1,9 +1,10 @@
 # Neural Network Team 5 - Neural Networks Spring 2024
 
 ## Members
-Ziyi Guo
-Jeremy Whipple
-Jessica Cisneros
+- Ziyi Guo
+- Jeremy Whipple
+- Jessica Cisneros
+- Adam Shaker
 
 ## Resources
 - [Google Drive](https://docs.google.com/document/d/192plAoD7LcFVFtnl3MZ80Ufv4Z3IQYNonejYrzYmdpo/edit?usp=sharing)
