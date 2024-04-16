@@ -15,8 +15,10 @@
 ### BreakDown/Goals
 
 #### Summary of the Project
-- Determine the best targeted advertising campaign for a company 
-
-
+- Advertising companies want to maximize revenue per dollar spent on targeted advertising campaigns.
+- Two Important Features:
+  - Size of Wallet (SOW): An estimate of a household's disposable income.
+  - Local Affluence Code (LAC): A measure of neighborhood affluence based on housing prices and other factors.
+  - These features map to the Targeted Advertising Code Assignment (TACA), which indicates whether a targeted advertising campaign is likely to have a positive (1) or negative (0) return.
 - Two Neural Networks and Train on the Data
 - 

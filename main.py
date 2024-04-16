@@ -166,6 +166,7 @@ def main():
             print(f"Input: {inputs}, Target: {target}")
             nn.target = target
             nn.predict(inputs)
+
     elif method == 2:
         # Method 2
         print(f"Method 2 --------------------------------------------------")
