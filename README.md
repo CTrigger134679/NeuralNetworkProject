@@ -1,4 +1,4 @@
-# Neural Network Team 5 - Neural Networks Spring 2024
+# Final Project Team 5 - Neural Networks Spring 2024
 
 ## Members
 - Ziyi Guo
