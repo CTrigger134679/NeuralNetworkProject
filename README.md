@@ -12,7 +12,9 @@
 ### Goals
 - [ ] Complete the `Single Perceptron Training`
 - [ ] Complete the `Module-7 Inspired Neural Network Training`
-- [ ] 
+- [ ] Complete Optimization of threshold
+- [ ] Complete Report
+  - [ ] PlaceHolder
 
 ### BreakDown/Goals
 - Train the network using the odd-numbered data points and the online training technique with 30 cycles
