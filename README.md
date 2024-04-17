@@ -10,14 +10,17 @@
 - [Google Drive](https://docs.google.com/document/d/192plAoD7LcFVFtnl3MZ80Ufv4Z3IQYNonejYrzYmdpo/edit?usp=sharing)
 
 ### Goals
-[ ] Complete the `Single Perceptron Training`
-[ ] Complete the `Module-7 Inspired Neural Network Training`
-[ ] 
+- [ ] Complete the `Single Perceptron Training`
+- [ ] Complete the `Module-7 Inspired Neural Network Training`
+- [ ] Complete Optimization of threshold
+- [ ] Complete Report
+  - [ ] PlaceHolder
 
 ### BreakDown/Goals
-- Train the network using the odd-numbered data points and the online trainign techique with 30 cycles
-- 
-
+- Train the network using the odd-numbered data points and the online training technique with 30 cycles
+- Optimize the trained networks by determining the best threshold for mapping the output to 0 or 1, and evaluate the Receiver Operating Characteristics (ROCs).
+- Test the networks using the even-numbered data points to determine the actual ROCS.
+- Write a report documenting the network designs, computational performance, analysis, and suggestions for improvement, following the provided guidelines and grading criteria.
 #### Summary of the Project
 - Advertising companies want to maximize revenue per dollar spent on targeted advertising campaigns.
 - Two Important Features:
