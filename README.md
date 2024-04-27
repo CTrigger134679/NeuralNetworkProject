@@ -30,6 +30,8 @@ The report contains the following:
 - **Conclusion** - Summarize the problem, networks, and performance and discuss possible improvements (can just be conjecture). - **Complete after analysis**
 - **Appendix** - Contains images and code as well as other references we may have made use of in our efforts. - **Add to as we work on the report**
 
+**NOTE** - The difference between the two 'performance' sections isn't terribly clear, so we don't need to separate them so much.  Instead we can have a section discussing the performance and comparison betwwen the two models, including the metrics and 'analysis' relating to those (We need to discuss all our observations). We can then also discuss our thoughts for the possible improvments in a different section.
+
 #### Summary of the Project
 - Advertising companies want to maximize revenue per dollar spent on targeted advertising campaigns.
 - Two Important Features:
