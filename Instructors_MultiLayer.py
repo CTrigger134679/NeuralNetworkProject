@@ -37,6 +37,10 @@ class perceptron(object):
     def calc_activation(self, input_vector):
         self.calc_activity(input_vector)
         self.activation = 1/(1.0 + np.exp(-1*self.activity))
+        if self.activation >= 0.8: # perceptron threshold logic
+            self.activation = 1
+        else:
+            self.activation = 0
 
     def get_activation(self):
         # self.calc_activation(input_vector)
@@ -221,46 +225,4 @@ for pair in range(0,10):
     BigE = 0.5*Error**2
     print("Input " + str(input_val[pair,:]))
     print("Desired Value " + str(desiredOut[pair,:]) + " Actual Value " + str(BigE))
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#print("Input " + str(input[0,:]) + " -->" + str(output_out))
-#print("Big E at end " + " = " + str(BigE))
-
 
