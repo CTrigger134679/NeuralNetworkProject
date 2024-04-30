@@ -5,6 +5,9 @@ import matplotlib.pyplot as plt
 
 class Perceptron:
     def __init__(self, weights: np.ndarray, bias: float, is_categorical: bool, threshold):
+        self.big_error = None
+        self.little_error = None
+        self.target = None
         self.weights = weights
         self.bias = bias
         self.delta_weights = np.zeros_like(weights)
@@ -46,18 +49,28 @@ class Perceptron:
     def train(self, inputs, target, eta, use_bias):
         self.calc_activity(inputs)
         self.calc_sig_activation()
+        self.target = target
         error = target - self.activation
         self.calc_output_delta(error)
         self.set_delta_weights(inputs, eta, use_bias)
         self.update_weights()
 
-    def predict(self, inputs, threshold):
+    def calculate_error(self):
+        self.little_error = self.target - self.activation
+        # print(f"Little Error: {self.little_error}")
+        self.big_error = 0.5 * (self.little_error ** 2)
+        print(f"Big Error: {self.big_error}")
+
+    def predict(self, inputs, target, threshold):
+        self.target = target
         self.calc_activity(inputs)
         self.calc_sig_activation()
         if self.is_categorical:
             self.output = 1 if self.activation > threshold else 0
         else:
             self.output = self.activation
+        self.calculate_error()
+
 
         # print(f"Inputs: {inputs}")
         # print(f"Activity Value: {self.activity}")
@@ -87,10 +100,10 @@ class NeuralNetwork:
         self.output_perceptron = Perceptron(self.output_layer_weights[0], self.bias, True, output_threshold)
 
     def feed_forward(self, threshold):
-        self.hidden_perceptron_1.predict(self.input_values, threshold)
-        self.hidden_perceptron_2.predict(self.input_values, threshold)
+        self.hidden_perceptron_1.predict(self.input_values, self.target, threshold)
+        self.hidden_perceptron_2.predict(self.input_values, self.target, threshold)
         pred = self.output_perceptron.predict(np.array(
-            [self.hidden_perceptron_1.activation, self.hidden_perceptron_2.activation]),threshold)
+            [self.hidden_perceptron_1.activation, self.hidden_perceptron_2.activation]), self.target, threshold)
         self.calculate_error()
         return pred
 
@@ -127,12 +140,43 @@ class NeuralNetwork:
         # print(f"Target: {target}")
         # print(f"Output: {self.output_perceptron.activation}\n")
 
-    def predict(self, inputs, threshold):
+    def predict(self, inputs, target, threshold):
+        self.target = target
         self.input_values = inputs
         pred = self.feed_forward(threshold)
         return pred
         # print(f"Inputs: {inputs}")
         # print(f"Output: {self.output_perceptron.activation}\n")
+
+def f_beta_score(precision, recall, beta):
+    return (1 + beta**2) * (precision * recall) / (beta**2 * precision + recall)
+
+def plot_precision_recall_curve(thresholds, tp, fp, tn, fn, title):
+    precisions = []
+    recalls = []
+
+    for i in range(len(thresholds)):
+        if tp[i] + fp[i] > 0:
+            precision = tp[i] / (tp[i] + fp[i])
+        else:
+            precision = 0
+
+        if tp[i] + fn[i] > 0:
+            recall = tp[i] / (tp[i] + fn[i])
+        else:
+            recall = 0
+
+        precisions.append(precision)
+        recalls.append(recall)
+
+    plt.figure(figsize=(8, 6))
+    plt.plot(recalls, precisions)
+    plt.xlabel('Recall')
+    plt.ylabel('Precision')
+    plt.title(title)
+    plt.show()
+
+
 
 
 def main():
@@ -142,7 +186,7 @@ def main():
     use_bias = True
     bias = -0.5
     data = pd.read_csv('D:\\NeuralNetworkProject\\data.csv')
-    iteration = 10
+    iteration = 30
 
     #--------------------TRAIN WITH SINGLE PERCEPTRON---------------------------#
 
@@ -158,6 +202,9 @@ def main():
     test_tn_total = np.zeros(len(thresholds))
     test_fp_total = np.zeros(len(thresholds))
     test_fn_total = np.zeros(len(thresholds))
+
+    big_e_total = np.zeros(len(thresholds))
+    big_e_total_test = np.zeros(len(thresholds))
 
     # Loop over iterations
     for n in range(iteration):
@@ -178,7 +225,8 @@ def main():
                 if j % 2 == 0:
                     inputs = data.iloc[j, 1:3].values
                     target = data.iloc[j, 3]
-                    prediction = perceptron.predict(inputs, threshold)
+                    prediction = perceptron.predict(inputs, target, threshold)
+                    big_e_total[t] += perceptron.big_error
                     if prediction == target:
                         if target == 0:
                             tn_total[t] += 1
@@ -193,7 +241,8 @@ def main():
                 if j % 2 != 0:
                     inputs = data.iloc[j, 1:3].values
                     target = data.iloc[j, 3]
-                    prediction = perceptron.predict(inputs, threshold)
+                    prediction = perceptron.predict(inputs, target, threshold)
+                    big_e_total_test[t] += perceptron.big_error
                     if prediction == target:
                         if target == 0:
                             test_tn_total[t] += 1
@@ -206,12 +255,23 @@ def main():
                             test_fp_total[t] += 1
 
     # Compute averages across iterations
+    big_e = big_e_total/iteration
+    big_e_test = big_e_total_test/iteration
+
+    plt.figure(figsize=(8, 6))
+    plt.plot(thresholds, big_e, label='training data')
+    plt.plot(thresholds, big_e_test, label='testing data')
+    plt.title('mean squared error on by hidden layered network')
+
     tp_avg = tp_total / iteration
     tn_avg = tn_total / iteration
     fp_avg = fp_total / iteration
     fn_avg = fn_total / iteration
     precision_train = tp_avg / (tp_avg + fp_avg)
     recall_train = tp_avg / (tp_avg + fn_avg)
+    beta = 0.3
+    f_beta_scores = [f_beta_score(p, r, beta) for p, r in zip(precision_train, recall_train)]
+    print(f'beta scores {f_beta_scores}')
     f1_score_train = 2 * (precision_train * recall_train) / (precision_train + recall_train)
 
     tp_avg_test = test_tp_total/iteration
@@ -220,7 +280,10 @@ def main():
     fp_avg_test = test_fp_total/iteration
 
     # Find the optimal threshold based on the F1 score
-    optimal_threshold_neural_network = thresholds[np.argmax(f1_score_train)]
+    beta_scores_cleaned = [x if not np.isnan(x) else -np.inf for x in f_beta_scores]
+    optimal_threshold_idx = np.argmax(beta_scores_cleaned)
+    print(f'index of best score {optimal_threshold_idx}')
+    optimal_threshold_neural_network = thresholds[optimal_threshold_idx]
     print(f"Optimal threshold for single percetron neural network: {optimal_threshold_neural_network}")
 
     fig, axs = plt.subplots(2, 1, figsize=(8, 6), sharex=True)  # Create two vertically aligned subplots
@@ -251,18 +314,26 @@ def main():
     plt.subplots_adjust(hspace=0.5)  # Adjust the vertical spacing between subplots
     plt.show()
 
+    plot_precision_recall_curve(thresholds, tp_avg, fp_avg,
+                                tn_avg, fn_avg, 'Precision-Recall for Training Data by Single Perceptron')
+    plot_precision_recall_curve(thresholds, tp_avg_test, fp_avg_test,
+                                tn_avg_test, fn_avg_test, 'Precision-Recall for Testing Data by Single Perceptron')
+
     # #--------------------TRAIN WITH HIDDEN LAYER---------------------------#
 
     tp_total = np.zeros(len(thresholds))
     tn_total = np.zeros(len(thresholds))
     fp_total = np.zeros(len(thresholds))
     fn_total = np.zeros(len(thresholds))
-    print(f'tp total {tp_total}')
+    # print(f'tp total {tp_total}')
 
     test_tp_total = np.zeros(len(thresholds))
     test_tn_total = np.zeros(len(thresholds))
     test_fp_total = np.zeros(len(thresholds))
     test_fn_total = np.zeros(len(thresholds))
+
+    big_e_total = np.zeros(len(thresholds))
+    big_e_total_test = np.zeros(len(thresholds))
     print(f"Online training for odd numbered items --------------------------------------------------")
     for n in range(iteration):
         # Train the network
@@ -282,7 +353,8 @@ def main():
                 if j % 2 == 0:
                     inputs = data.iloc[j, 1:3].values
                     target = data.iloc[j, 3]
-                    prediction = nn_2.predict(inputs, threshold)
+                    prediction = nn_2.predict(inputs, target, threshold)
+                    big_e_total[t] += nn_2.big_error
                     if prediction == target:
                         if target == 0:
                             tn_total[t] += 1
@@ -297,7 +369,8 @@ def main():
                 if j % 2 != 0:
                     inputs = data.iloc[j, 1:3].values
                     target = data.iloc[j, 3]
-                    prediction = perceptron.predict(inputs, threshold)
+                    prediction = nn_2.predict(inputs, target, threshold)
+                    big_e_total_test[t] += nn_2.big_error
                     if prediction == target:
                         if target == 0:
                             test_tn_total[t] += 1
@@ -310,13 +383,24 @@ def main():
                             test_fp_total[t] += 1
 
                 # Compute averages across iterations
-    print(f'tp total after training {tp_total}')
+    # print(f'tp total after training {tp_total}')
+    big_e = big_e_total/iteration
+    big_e_test = big_e_total_test/iteration
+
+    plt.figure(figsize=(8, 6))
+    plt.plot(thresholds, big_e, label='training data')
+    plt.plot(thresholds, big_e_test, label='testing data')
+    plt.title('mean squared error on by hidden layered network')
+
     tp_avg = tp_total / iteration
     tn_avg = tn_total / iteration
     fp_avg = fp_total / iteration
     fn_avg = fn_total / iteration
     precision_train = tp_avg / (tp_avg + fp_avg)
     recall_train = tp_avg / (tp_avg + fn_avg)
+    beta = 0.3
+    f_beta_scores = [f_beta_score(p, r, beta) for p, r in zip(precision_train, recall_train)]
+    print(f'beta scores {f_beta_scores}')
     f1_score_train = 2 * (precision_train * recall_train) / (precision_train + recall_train)
 
     tp_avg_test = test_tp_total / iteration
@@ -325,7 +409,10 @@ def main():
     fp_avg_test = test_fp_total / iteration
 
     # Find the optimal threshold based on the F1 score
-    optimal_threshold_neural_network = thresholds[np.argmax(f1_score_train)]
+    beta_scores_cleaned = [x if not np.isnan(x) else -np.inf for x in f_beta_scores]
+    optimal_threshold_idx = np.argmax(beta_scores_cleaned)
+    print(f'index of best score {optimal_threshold_idx}')
+    optimal_threshold_neural_network = thresholds[optimal_threshold_idx]
     print(f"Optimal threshold for hidden layer neural network: {optimal_threshold_neural_network}")
 
     fig, axs = plt.subplots(2, 1, figsize=(8, 6), sharex=True)  # Create two vertically aligned subplots
@@ -355,6 +442,10 @@ def main():
 
     plt.subplots_adjust(hspace=0.5)  # Adjust the vertical spacing between subplots
     plt.show()
+    plot_precision_recall_curve(thresholds, tp_avg, fp_avg,
+                                tn_avg, fn_avg, 'Precision-Recall for Training Data by Hidden Layered Network')
+    plot_precision_recall_curve(thresholds, tp_avg_test, fp_avg_test,
+                                tn_avg_test, fn_avg_test, 'Precision-Recall for Testing Data by Hidden Layered Network')
 
 
 if __name__ == "__main__":
