@@ -2,6 +2,8 @@ import numpy as np
 from enum import Enum
 import pandas as pd
 import matplotlib.pyplot as plt
+import scipy.stats as stats
+
 
 class Perceptron:
     def __init__(self, weights: np.ndarray, bias: float, is_categorical: bool, threshold):
@@ -59,7 +61,7 @@ class Perceptron:
         self.little_error = self.target - self.activation
         # print(f"Little Error: {self.little_error}")
         self.big_error = 0.5 * (self.little_error ** 2)
-        print(f"Big Error: {self.big_error}")
+        # print(f"Big Error: {self.big_error}")
 
     def predict(self, inputs, target, threshold):
         self.target = target
@@ -145,8 +147,7 @@ class NeuralNetwork:
         self.input_values = inputs
         pred = self.feed_forward(threshold)
         return pred
-        # print(f"Inputs: {inputs}")
-        # print(f"Output: {self.output_perceptron.activation}\n")
+
 
 def f_beta_score(precision, recall, beta):
     return (1 + beta**2) * (precision * recall) / (beta**2 * precision + recall)
@@ -180,19 +181,18 @@ def plot_precision_recall_curve(thresholds, tp, fp, tn, fn, title):
 
 
 def main():
-    # Define the weights and bias for the neural network
-
-    learning_rate = 1
+    data = pd.read_csv('D:\\NeuralNetworkProject\\data.csv')  # would need to change to suit your machine
+    iteration = 30  # number of iterations for significance
+    learning_rate = 1  # learning rate of the network
+    beta = 0.3 # weighing of precision vs recall in determining optimal threshold.
+               # The lower the value of beta, the more weight will be given to precision compared to recall.
     use_bias = True
     bias = -0.5
-    data = pd.read_csv('D:\\NeuralNetworkProject\\data.csv')
-    iteration = 30
-
-    #--------------------TRAIN WITH SINGLE PERCEPTRON---------------------------#
-
-    is_categorical = True
     thresholds = np.arange(0, 1, .01)
 
+
+    #--------------------TRAIN WITH SINGLE PERCEPTRON---------------------------#
+    is_categorical = True
     tp_total = np.zeros(len(thresholds))
     tn_total = np.zeros(len(thresholds))
     fp_total = np.zeros(len(thresholds))
@@ -257,11 +257,13 @@ def main():
     # Compute averages across iterations
     big_e = big_e_total/iteration
     big_e_test = big_e_total_test/iteration
+    # print(f'big e {big_e} out of {big_e_total}')
+    # print(f' big e test {big_e_test} out of {big_e_total_test}')
 
     plt.figure(figsize=(8, 6))
     plt.plot(thresholds, big_e, label='training data')
     plt.plot(thresholds, big_e_test, label='testing data')
-    plt.title('mean squared error on by hidden layered network')
+    plt.title('mean squared error across thresholds by hidden layered network')
 
     tp_avg = tp_total / iteration
     tn_avg = tn_total / iteration
@@ -269,10 +271,10 @@ def main():
     fn_avg = fn_total / iteration
     precision_train = tp_avg / (tp_avg + fp_avg)
     recall_train = tp_avg / (tp_avg + fn_avg)
-    beta = 0.3
+
     f_beta_scores = [f_beta_score(p, r, beta) for p, r in zip(precision_train, recall_train)]
-    print(f'beta scores {f_beta_scores}')
-    f1_score_train = 2 * (precision_train * recall_train) / (precision_train + recall_train)
+    # print(f'beta scores {f_beta_scores}')
+    # f1_score_train = 2 * (precision_train * recall_train) / (precision_train + recall_train)
 
     tp_avg_test = test_tp_total/iteration
     tn_avg_test = test_tn_total/iteration
@@ -334,7 +336,7 @@ def main():
 
     big_e_total = np.zeros(len(thresholds))
     big_e_total_test = np.zeros(len(thresholds))
-    print(f"Online training for odd numbered items --------------------------------------------------")
+
     for n in range(iteration):
         # Train the network
         hidden_layer_weights = [np.random.rand(2), np.random.rand(2)]
@@ -386,11 +388,14 @@ def main():
     # print(f'tp total after training {tp_total}')
     big_e = big_e_total/iteration
     big_e_test = big_e_total_test/iteration
+    # print(f'big e {big_e} out of {big_e_total}')
+    # print(f' big e test {big_e_test} out of {big_e_total_test}')
 
     plt.figure(figsize=(8, 6))
     plt.plot(thresholds, big_e, label='training data')
     plt.plot(thresholds, big_e_test, label='testing data')
-    plt.title('mean squared error on by hidden layered network')
+    plt.legend()
+    plt.title('mean squared error across thresholds on by hidden layered network')
 
     tp_avg = tp_total / iteration
     tn_avg = tn_total / iteration
@@ -398,10 +403,9 @@ def main():
     fn_avg = fn_total / iteration
     precision_train = tp_avg / (tp_avg + fp_avg)
     recall_train = tp_avg / (tp_avg + fn_avg)
-    beta = 0.3
     f_beta_scores = [f_beta_score(p, r, beta) for p, r in zip(precision_train, recall_train)]
-    print(f'beta scores {f_beta_scores}')
-    f1_score_train = 2 * (precision_train * recall_train) / (precision_train + recall_train)
+    # print(f'beta scores {f_beta_scores}')
+    # f1_score_train = 2 * (precision_train * recall_train) / (precision_train + recall_train)
 
     tp_avg_test = test_tp_total / iteration
     tn_avg_test = test_tn_total / iteration
