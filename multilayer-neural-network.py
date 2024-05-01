@@ -56,7 +56,7 @@ class Perceptron:
         self.update_weights()
 
     def calculate_error(self):
-        self.little_error = self.target - self.activation
+        self.little_error = self.target - self.output
         # print(f"Little Error: {self.little_error}")
         self.big_error = 0.5 * (self.little_error ** 2)
         # print(f"Big Error: {self.big_error}")
@@ -70,13 +70,7 @@ class Perceptron:
         else:
             self.output = self.activation
         self.calculate_error()
-
-
-        # print(f"Inputs: {inputs}")
-        # print(f"Activity Value: {self.activity}")
-        # if self.is_categorical:
-        #     print(f'Activation Value: {self.activation}')
-        #     print(f"Output Value: {self.output} under {threshold}")
+        # print(f'current big error {self.big_error}')
         return self.output
 
 
@@ -127,7 +121,7 @@ class NeuralNetwork:
         self.hidden_layer_weights = [self.hidden_perceptron_1.weights, self.hidden_perceptron_2.weights]
 
     def calculate_error(self):
-        self.little_error = self.target - self.output_perceptron.activation
+        self.little_error = self.target - self.output_perceptron.output
         # print(f"Little Error: {self.little_error}")
         self.big_error = 0.5 * (self.little_error ** 2)
         # print(f"Big Error: {self.big_error}")
@@ -144,6 +138,7 @@ class NeuralNetwork:
         self.target = target
         self.input_values = inputs
         pred = self.feed_forward(threshold)
+        # print(f'current big error {self.big_error}')
         return pred
 
 
@@ -190,7 +185,7 @@ def main():
     data = pd.read_csv('D:\\NeuralNetworkProject\\data.csv')  # would need to change to suit your machine
     iteration = 30  # number of iterations for significance
     learning_rate = 1  # learning rate of the network
-    beta = 0.3 # weighing of precision vs recall in determining optimal threshold.
+    beta = 0.2 # weighing of precision vs recall in determining optimal threshold.
                # The lower the value of beta, the more weight will be given to precision compared to recall.
     use_bias = True
     bias = -0.5
@@ -349,7 +344,11 @@ def main():
 
     fig, axs = plt.subplots(2, 1, figsize=(8, 6), sharex=True)  # Create two vertically aligned subplots
     axs[0].plot(thresholds, big_e_avg, label='training data')
+    axs[0].set_title('Average Big E across Thresholds on Training Data by Single Perceptron Network')
+
     axs[1].plot(thresholds, big_e_avg_test, label='testing data')
+    axs[1].set_title('Average Big E across Thresholds on Testing Data by Single Perceptron Network')
+
     plt.subplots_adjust(hspace=0.5)  # Adjust the vertical spacing between subplots
     plt.show()
 
@@ -511,7 +510,10 @@ def main():
 
     fig, axs = plt.subplots(2, 1, figsize=(8, 6), sharex=True)  # Create two vertically aligned subplots
     axs[0].plot(thresholds, big_e_avg, label='training data')
+    axs[0].set_title('Average Big E across Thresholds on Training Data by Hidden Layered Network')
+
     axs[1].plot(thresholds, big_e_avg_test, label='testing data')
+    axs[1].set_title('Average Big E across Thresholds on Testing Data by Hidden Layered Network')
     plt.subplots_adjust(hspace=0.5)  # Adjust the vertical spacing between subplots
     plt.show()
 
@@ -523,9 +525,9 @@ def main():
 
     #-----------------------------Report final weights-----------------------------------------#
     # single perceptron
-    print(f'final weights for single perceptron: {perceptron.weights}')
+    print(f'final weights for single perceptron: {perceptron.weights}\n')
     # hidden layered network
-    print(f'final weights for hidden layered network: \n')
+    print(f'final weights for hidden layered network:')
     print(f'hidden nodes {nn_2.hidden_layer_weights}; output node {nn_2.output_layer_weights}')
 
 
