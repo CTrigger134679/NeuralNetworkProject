@@ -10,11 +10,10 @@
 - [Google Drive](https://docs.google.com/document/d/192plAoD7LcFVFtnl3MZ80Ufv4Z3IQYNonejYrzYmdpo/edit?usp=sharing)
 
 ### Goals
-- [ ] Complete the `Single Perceptron Training`
-- [ ] Complete the `Module-7 Inspired Neural Network Training`
-- [ ] Complete Optimization of threshold
-- [ ] Complete Report
-  - [ ] PlaceHolder
+- [ :white_check_mark: ] Complete the `Single Perceptron Training`
+- [ :white_check_mark: ] Complete the `Module-7 Inspired Neural Network Training`
+- [ :white_check_mark: ] Complete Optimization of threshold
+- [ :white_check_mark: ] Complete Report
 
 ### BreakDown/Goals
 - Train the network using the **odd-numbered** data points and the online training technique with 30 cycles
